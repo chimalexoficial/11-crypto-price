@@ -18,12 +18,21 @@ document.addEventListener('DOMContentLoaded', () => {
     currencySelect.addEventListener('change', readValue);
 })
 
-function fetchCryptos() {
+async function fetchCryptos() {
     const url = 'https://min-api.cryptocompare.com/data/top/mktcapfull?limit=10&tsym=USD';
-    fetch(url)
-        .then(res => res.json())
-        .then(res => getCryptos(res.Data))
-        .then(crypto => selectCryptos(crypto));
+    // fetch(url)
+    //     .then(res => res.json())
+    //     .then(res => getCryptos(res.Data))
+    //     .then(crypto => selectCryptos(crypto));
+
+    try {
+        const request = await fetch(url);
+        const response = await request.json();
+        const cryptos = await getCryptos(response.Data);
+        selectCryptos(cryptos);
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 function selectCryptos(cryptos) {
@@ -72,17 +81,24 @@ function showAlert(message) {
     }, 2000)
 }
 
-function getAPI() {
+async function getAPI() {
     const { currency, crypto } = objUser;
     const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${crypto}&tsyms=${currency}`;
 
     showSpinner();
 
-    setTimeout(() => {
-        fetch(url)
-        .then(res => res.json())
-        .then(res => showInfoHTML(res.DISPLAY[crypto][currency]))
-    }, 700)
+        // fetch(url)
+        // .then(res => res.json())
+        // .then(res => showInfoHTML(res.DISPLAY[crypto][currency]))
+        try {
+            const req = await fetch(url);
+            const res = await req.json();
+            showInfoHTML(res.DISPLAY[crypto][currency])
+        } catch (error) {
+            console.log(error);
+        }
+
+
 }
 function showInfoHTML(info) {
     // const isPriceClassActive = document.querySelector('.price');
@@ -144,7 +160,7 @@ function showSpinner() {
         </div>
         `
 
-        result.appendChild(spinner)
+    result.appendChild(spinner)
 
 }
 
